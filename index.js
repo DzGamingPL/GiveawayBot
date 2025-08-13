@@ -49,12 +49,10 @@ const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 (async () => {
     try {
-        console.log('Registering slash commands...');
         await rest.put(
             Routes.applicationCommands(process.env.CLIENT_ID),
             { body: commands }
         );
-        console.log('Slash commands registered successfully!');
     } catch (error) {
         console.error('Error registering commands:', error);
     }
@@ -141,12 +139,8 @@ client.on('messageCreate', async message => {
     const command = args.shift().toLowerCase();
 
     if (command === 'konkurs') {
-        if (!message.member.roles.cache.has('1404155296158584904')) {
-            return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
-        }
-        if (!message.member.permissions.has('ManageMessages')) {
-            return message.reply('You need the Manage Messages permission to start giveaways.');
-        }
+        if (!message.member.roles.cache.has('1404155296158584904')) return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
+        if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to start giveaways.');
         const channel = message.mentions.channels.first();
         if (!channel) return message.reply('Please mention a valid channel.');
         const duration = args[1];
@@ -171,12 +165,8 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'zakoncz') {
-        if (!message.member.roles.cache.has('1404155296158584904')) {
-            return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
-        }
-        if (!message.member.permissions.has('ManageMessages')) {
-            return message.reply('You need the Manage Messages permission to end giveaways.');
-        }
+        if (!message.member.roles.cache.has('1404155296158584904')) return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
+        if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to end giveaways.');
         const messageId = args[0];
         if (!messageId) return message.reply('Please provide a giveaway message ID.');
         const success = await endGiveaway(messageId, message.channel);
@@ -185,12 +175,8 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'reroll') {
-        if (!message.member.roles.cache.has('1404155296158584904')) {
-            return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
-        }
-        if (!message.member.permissions.has('ManageMessages')) {
-            return message.reply('You need the Manage Messages permission to reroll giveaways.');
-        }
+        if (!message.member.roles.cache.has('1404155296158584904')) return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
+        if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to reroll giveaways.');
         const messageId = args[0];
         if (!messageId) return message.reply('Please provide an ended giveaway message ID.');
         const result = await rerollGiveaway(messageId);
@@ -219,16 +205,12 @@ client.on('interactionCreate', async interaction => {
     const { commandName, options } = interaction;
 
     if (commandName === 'konkurs') {
-        if (!interaction.member.roles.cache.has('1404155296158584904')) {
-            return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
-        }
-        if (!interaction.memberPermissions.has('ManageMessages')) {
-            return interaction.reply({ content: 'You need the Manage Messages permission to start giveaways.', ephemeral: true });
-        }
-        const channel = options.getChannel('channel');
-        const duration = options.getString('duration');
-        const prize = options.getString('prize');
-        const winners = options.getInteger('winners');
+        if (!interaction.member.roles.cache.has('1404155296158584904')) return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
+        if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to start giveaways.', ephemeral: true });
+        const channel = options.getChannel('kanal');
+        const duration = options.getString('czas');
+        const prize = options.getString('nagroda');
+        const winners = options.getInteger('zwyciezcy');
         const embed = createGiveawayEmbed(duration, prize, winners);
         const giveawayMessage = await channel.send({ embeds: [embed] });
         await giveawayMessage.react('🎉');
@@ -245,32 +227,20 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (commandName === 'zakoncz') {
-        if (!interaction.member.roles.cache.has('1404155296158584904')) {
-            return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
-        }
-        if (!interaction.memberPermissions.has('ManageMessages')) {
-            return interaction.reply({ content: 'You need the Manage Messages permission to end giveaways.', ephemeral: true });
-        }
+        if (!interaction.member.roles.cache.has('1404155296158584904')) return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
+        if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to end giveaways.', ephemeral: true });
         const messageId = options.getString('message_id');
         const success = await endGiveaway(messageId, interaction.channel);
-        if (!success) {
-            return interaction.reply({ content: 'Could not find an active giveaway with that ID.', ephemeral: true });
-        }
+        if (!success) return interaction.reply({ content: 'Could not find an active giveaway with that ID.', ephemeral: true });
         await interaction.reply({ content: `${client.user.username} ended the giveaway successfully!`, ephemeral: true });
     }
 
     if (commandName === 'reroll') {
-        if (!interaction.member.roles.cache.has('1404155296158584904')) {
-            return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
-        }
-        if (!interaction.memberPermissions.has('ManageMessages')) {
-            return interaction.reply({ content: 'You need the Manage Messages permission to reroll giveaways.', ephemeral: true });
-        }
+        if (!interaction.member.roles.cache.has('1404155296158584904')) return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
+        if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to reroll giveaways.', ephemeral: true });
         const messageId = options.getString('message_id');
         const result = await rerollGiveaway(messageId);
-        if (!result) {
-            return interaction.reply({ content: 'Could not find an ended giveaway with that ID.', ephemeral: true });
-        }
+        if (!result) return interaction.reply({ content: 'Could not find an ended giveaway with that ID.', ephemeral: true });
         const winnerText = result.winners.length > 0 ? result.winners.join(', ') : 'No valid participants';
         const rerollEmbed = new EmbedBuilder()
             .setTitle('`🎉` DARK-CODE.PL ▸ KONKURS')
