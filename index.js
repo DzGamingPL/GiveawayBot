@@ -135,11 +135,11 @@ async function rerollGiveaway(messageId) {
 
 client.on('messageCreate', async message => {
     if (message.author.bot || !message.content.startsWith(process.env.PREFIX)) return;
+    if (!message.member.roles.cache.has('1404155296158584904')) return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
     const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
     if (command === 'konkurs') {
-        if (!message.member.roles.cache.has('1404155296158584904')) return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
         if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to start giveaways.');
         const channel = message.mentions.channels.first();
         if (!channel) return message.reply('Please mention a valid channel.');
@@ -165,7 +165,6 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'zakoncz') {
-        if (!message.member.roles.cache.has('1404155296158584904')) return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
         if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to end giveaways.');
         const messageId = args[0];
         if (!messageId) return message.reply('Please provide a giveaway message ID.');
@@ -175,7 +174,6 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'reroll') {
-        if (!message.member.roles.cache.has('1404155296158584904')) return message.reply('Nie masz wymaganej roli, aby użyć tej komendy.');
         if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to reroll giveaways.');
         const messageId = args[0];
         if (!messageId) return message.reply('Please provide an ended giveaway message ID.');
@@ -202,10 +200,10 @@ client.on('messageCreate', async message => {
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.isCommand()) return;
+    if (!interaction.member.roles.cache.has('1404155296158584904')) return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
     const { commandName, options } = interaction;
 
     if (commandName === 'konkurs') {
-        if (!interaction.member.roles.cache.has('1404155296158584904')) return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
         if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to start giveaways.', ephemeral: true });
         const channel = options.getChannel('kanal');
         const duration = options.getString('czas');
@@ -227,7 +225,6 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (commandName === 'zakoncz') {
-        if (!interaction.member.roles.cache.has('1404155296158584904')) return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
         if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to end giveaways.', ephemeral: true });
         const messageId = options.getString('message_id');
         const success = await endGiveaway(messageId, interaction.channel);
@@ -236,7 +233,6 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (commandName === 'reroll') {
-        if (!interaction.member.roles.cache.has('1404155296158584904')) return interaction.reply({ content: 'Nie masz wymaganej roli, aby użyć tej komendy.', ephemeral: true });
         if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to reroll giveaways.', ephemeral: true });
         const messageId = options.getString('message_id');
         const result = await rerollGiveaway(messageId);
