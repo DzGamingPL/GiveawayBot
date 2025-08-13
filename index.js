@@ -140,7 +140,6 @@ client.on('messageCreate', async message => {
     const command = args.shift().toLowerCase();
 
     if (command === 'konkurs') {
-        if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to start giveaways.');
         const channel = message.mentions.channels.first();
         if (!channel) return message.reply('Please mention a valid channel.');
         const duration = args[1];
@@ -165,7 +164,6 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'zakoncz') {
-        if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to end giveaways.');
         const messageId = args[0];
         if (!messageId) return message.reply('Please provide a giveaway message ID.');
         const success = await endGiveaway(messageId, message.channel);
@@ -174,7 +172,6 @@ client.on('messageCreate', async message => {
     }
 
     if (command === 'reroll') {
-        if (!message.member.permissions.has('ManageMessages')) return message.reply('You need the Manage Messages permission to reroll giveaways.');
         const messageId = args[0];
         if (!messageId) return message.reply('Please provide an ended giveaway message ID.');
         const result = await rerollGiveaway(messageId);
@@ -204,7 +201,6 @@ client.on('interactionCreate', async interaction => {
     const { commandName, options } = interaction;
 
     if (commandName === 'konkurs') {
-        if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to start giveaways.', ephemeral: true });
         const channel = options.getChannel('kanal');
         const duration = options.getString('czas');
         const prize = options.getString('nagroda');
@@ -225,7 +221,6 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (commandName === 'zakoncz') {
-        if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to end giveaways.', ephemeral: true });
         const messageId = options.getString('message_id');
         const success = await endGiveaway(messageId, interaction.channel);
         if (!success) return interaction.reply({ content: 'Could not find an active giveaway with that ID.', ephemeral: true });
@@ -233,7 +228,6 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (commandName === 'reroll') {
-        if (!interaction.memberPermissions.has('ManageMessages')) return interaction.reply({ content: 'You need the Manage Messages permission to reroll giveaways.', ephemeral: true });
         const messageId = options.getString('message_id');
         const result = await rerollGiveaway(messageId);
         if (!result) return interaction.reply({ content: 'Could not find an ended giveaway with that ID.', ephemeral: true });
