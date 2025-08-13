@@ -158,7 +158,7 @@
             const args = message.content.slice(process.env.PREFIX.length).trim().split(/ +/);
             const command = args.shift().toLowerCase();
 
-            if (command === 'start') {
+            if (command === 'konkurs') {
                 if (!message.member.permissions.has('ManageMessages')) {
                     return message.reply('You need the Manage Messages permission to start giveaways.');
                 }
@@ -193,7 +193,7 @@
                 await message.reply(`Giveaway started in ${channel}! ${client.user.username} will handle the rest!`);
             }
 
-            if (command === 'end') {
+            if (command === 'zakoncz') {
                 if (!message.member.permissions.has('ManageMessages')) {
                     return message.reply('You need the Manage Messages permission to end giveaways.');
                 }
@@ -246,7 +246,7 @@
 
             const { commandName, options } = interaction;
 
-            if (commandName === 'start') {
+            if (commandName === 'konkurs') {
                 if (!interaction.memberPermissions.has('ManageMessages')) {
                     return interaction.reply({ content: 'You need the Manage Messages permission to start giveaways.', ephemeral: true });
                 }
@@ -274,7 +274,7 @@
                 await interaction.reply({ content: `Giveaway started in ${channel}! ${client.user.username} will handle the rest!`, ephemeral: true });
             }
 
-            if (commandName === 'end') {
+            if (commandName === 'zakoncz') {
                 if (!interaction.memberPermissions.has('ManageMessages')) {
                     return interaction.reply({ content: 'You need the Manage Messages permission to end giveaways.', ephemeral: true });
                 }
@@ -309,7 +309,7 @@
                         `**Nagroda:** ${result.prize}\n` +
                         `**Nowi Zwyciężcy:** ${winnerText}`
                     )
-                    .setColor('#00FF00')
+                    .setColor('#9509dc')
                     .setTimestamp();
 
                 const endMessage = await result.channel.messages.fetch(result.endMessageId).catch(() => null);
