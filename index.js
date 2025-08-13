@@ -18,48 +18,31 @@
         const activeGiveaways = new Map();
         const endedGiveaways = new Map();
 
-        // Slash commands
         const commands = [
             {
-                name: 'start',
-                description: 'Start a new giveaway',
+                name: 'konkurs',
+                description: 'Tworzy konkurs.',
                 options: [
-                    { name: 'channel', type: 7, description: 'Channel to start giveaway in', required: true },
-                    { name: 'duration', type: 3, description: 'Duration (e.g., 1d, 2h)', required: true },
-                    { name: 'prize', type: 3, description: 'Prize to win', required: true },
-                    { name: 'winners', type: 4, description: 'Number of winners', required: true }
+                    { name: 'kanal', type: 7, description: 'kanal gdzie ma byc konkurs', required: true },
+                    { name: 'czas', type: 3, description: 'czas konkursu (np., 1d, 2h)', required: true },
+                    { name: 'nagroda', type: 3, description: 'nagroda', required: true },
+                    { name: 'zwyciezcy', type: 4, description: 'ilosc zwyciezcow', required: true }
                 ]
             },
             {
-                name: 'end',
-                description: 'End a giveaway early',
+                name: 'zakoncz',
+                description: 'zakoncz konkurs wczesniej',
                 options: [
-                    { name: 'message_id', type: 3, description: 'Giveaway message ID', required: true }
+                    { name: 'message_id', type: 3, description: 'id wiadomosci konkursu', required: true }
                 ]
             },
             {
                 name: 'reroll',
-                description: 'Reroll an ended giveaway',
+                description: 'reroll konkursu',
                 options: [
-                    { name: 'message_id', type: 3, description: 'Ended giveaway message ID', required: true }
+                    { name: 'message_id', type: 3, description: 'id wiadomosci konkursu skonczonego', required: true }
                 ]
             },
-            {
-                name: 'stats',
-                description: 'Show bot statistics'
-            },
-            {
-                name: 'invite',
-                description: 'Get bot invite link'
-            },
-            {
-                name: 'support',
-                description: 'Get support server link'
-            },
-            {
-                name: 'help',
-                description: 'Show help information'
-            }
         ];
 
         const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
@@ -79,21 +62,20 @@
 
         client.on('ready', () => {
             console.log(`Logged in as ${client.user.tag}`);
-            client.user.setActivity('/help', { type: ActivityType.Playing });
+            client.user.setActivity('DARK-CODE.PL', { type: ActivityType.Watching });
         });
 
         // Helper function to create giveaway embed
         function createGiveawayEmbed(duration, prize, winners) {
             return new EmbedBuilder()
-                .setTitle('🎉 GIVEAWAY 🎉')
+                .setTitle('`🎉` DARK-CODE.PL ▸ KONKURS')
                 .setDescription(
-                    `**Prize:** ${prize}\n` +
-                    `**Duration:** ${duration}\n` +
-                    `**Winners:** ${winners}\n\n` +
-                    'React with 🎉 to enter!'
+                    `**Nagroda:** ${prize}\n` +
+                    `**Czas:** ${duration}\n` +
+                    `**Zwyciężcy:** ${winners}\n\n` +
+                    'Kliknij w 🎉, aby wziąć udział!'
                 )
-                .setColor('#FFD700')
-                .setFooter({ text: `${client.user.username} Giveaway System` })
+                .setColor('#9509dc')
                 .setTimestamp();
         }
 
@@ -121,13 +103,12 @@
             const winnerText = winners.length > 0 ? winners.join(', ') : 'No valid participants';
 
             const endEmbed = new EmbedBuilder()
-                .setTitle('🎉 GIVEAWAY ENDED 🎉')
+                .setTitle('`🎉` DARK-CODE.PL ▸ KONKURS')
                 .setDescription(
-                    `**Prize:** ${giveaway.prize}\n` +
-                    `**Winners:** ${winnerText}`
+                    `**Nagroda:** ${giveaway.prize}\n` +
+                    `**Zwyciężcy:** ${winnerText}`
                 )
-                .setColor('#FF0000')
-                .setFooter({ text: `${client.user.username} Giveaway System` })
+                .setColor('#9509dc')
                 .setTimestamp();
 
             const endMessage = await channel.send({ embeds: [endEmbed] });
@@ -240,13 +221,12 @@
                 const winnerText = result.winners.length > 0 ? result.winners.join(', ') : 'No valid participants';
 
                 const rerollEmbed = new EmbedBuilder()
-                    .setTitle('🎉 GIVEAWAY REROLLED 🎉')
+                    .setTitle('`🎉` DARK-CODE.PL ▸ KONKURS')
                     .setDescription(
-                        `**Prize:** ${result.prize}\n` +
-                        `**New Winners:** ${winnerText}`
+                        `**Nagroda:** ${result.prize}\n` +
+                        `**Nowi Zwyciężcy:** ${winnerText}`
                     )
-                    .setColor('#00FF00')
-                    .setFooter({ text: `${client.user.username} Giveaway System` })
+                    .setColor('#9509dc')
                     .setTimestamp();
 
                 const endMessage = await result.channel.messages.fetch(result.endMessageId).catch(() => null);
@@ -257,51 +237,6 @@
                 }
 
                 await message.reply(`${client.user.username} rerolled the giveaway successfully!`);
-            }
-
-            if (command === 'stats') {
-                const embed = new EmbedBuilder()
-                    .setTitle(`${client.user.username} Statistics`)
-                    .addFields(
-                        { name: 'Servers', value: client.guilds.cache.size.toString(), inline: true },
-                        { name: 'Users', value: client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0).toString(), inline: true },
-                        { name: 'Active Giveaways', value: activeGiveaways.size.toString(), inline: true },
-                        { name: 'Ended Giveaways', value: endedGiveaways.size.toString(), inline: true }
-                    )
-                    .setColor('#7289DA')
-                    .setFooter({ text: `${client.user.username} Giveaway System` })
-                    .setTimestamp();
-
-                await message.reply({ embeds: [embed] });
-            }
-
-            if (command === 'invite') {
-                const inviteLink = `https://discord.com/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=277025770560&scope=bot%20applications.commands`;
-                await message.reply(`Invite ${client.user.username} to your server: ${inviteLink}`);
-            }
-
-            if (command === 'support') {
-                await message.reply(`Join our support server: https://discord.com/invite/9MVAPpfs8D\n\nNeed help with ${client.user.username}? We're here to help!`);
-            }
-
-            if (command === 'help') {
-                const embed = new EmbedBuilder()
-                    .setTitle(`${client.user.username} Commands Help`)
-                    .setDescription(`Here are all the available commands for ${client.user.username}:`)
-                    .addFields(
-                        { name: `${process.env.PREFIX}start #channel duration prize winners`, value: 'Start a new giveaway' },
-                        { name: `${process.env.PREFIX}end message_id`, value: 'End a giveaway early' },
-                        { name: `${process.env.PREFIX}reroll message_id`, value: 'Reroll an ended giveaway' },
-                        { name: `${process.env.PREFIX}stats`, value: 'Show bot statistics' },
-                        { name: `${process.env.PREFIX}invite`, value: 'Get bot invite link' },
-                        { name: `${process.env.PREFIX}support`, value: 'Get support server link' },
-                        { name: `${process.env.PREFIX}help`, value: 'Show this help message' }
-                    )
-                    .setColor('#7289DA')
-                    .setFooter({ text: `${client.user.username} Giveaway System` })
-                    .setTimestamp();
-
-                await message.reply({ embeds: [embed] });
             }
         });
 
@@ -369,13 +304,12 @@
                 const winnerText = result.winners.length > 0 ? result.winners.join(', ') : 'No valid participants';
 
                 const rerollEmbed = new EmbedBuilder()
-                    .setTitle('🎉 GIVEAWAY REROLLED 🎉')
+                    .setTitle('`🎉` DARK-CODE.PL ▸ KONKURS')
                     .setDescription(
-                        `**Prize:** ${result.prize}\n` +
-                        `**New Winners:** ${winnerText}`
+                        `**Nagroda:** ${result.prize}\n` +
+                        `**Nowi Zwyciężcy:** ${winnerText}`
                     )
                     .setColor('#00FF00')
-                    .setFooter({ text: `${client.user.username} Giveaway System` })
                     .setTimestamp();
 
                 const endMessage = await result.channel.messages.fetch(result.endMessageId).catch(() => null);
@@ -386,54 +320,6 @@
                 }
 
                 await interaction.reply({ content: `${client.user.username} rerolled the giveaway successfully!`, ephemeral: true });
-            }
-
-            if (commandName === 'stats') {
-                const embed = new EmbedBuilder()
-                    .setTitle(`${client.user.username} Statistics`)
-                    .addFields(
-                        { name: 'Servers', value: client.guilds.cache.size.toString(), inline: true },
-                        { name: 'Users', value: client.guilds.cache.reduce((acc, guild) => acc + guild.memberCount, 0).toString(), inline: true },
-                        { name: 'Active Giveaways', value: activeGiveaways.size.toString(), inline: true },
-                        { name: 'Ended Giveaways', value: endedGiveaways.size.toString(), inline: true }
-                    )
-                    .setColor('#7289DA')
-                    .setFooter({ text: `${client.user.username} Giveaway System` })
-                    .setTimestamp();
-
-                await interaction.reply({ embeds: [embed] });
-            }
-
-            if (commandName === 'invite') {
-                const inviteLink = `https://discord.com/oauth2/authorize?client_id=${process.env.CLIENT_ID}&permissions=277025770560&scope=bot%20applications.commands`;
-                await interaction.reply({ content: `Invite ${client.user.username} to your server: ${inviteLink}`, ephemeral: true });
-            }
-
-            if (commandName === 'support') {
-                await interaction.reply({ 
-                    content: `${client.user.username} support server: https://discord.com/invite/9MVAPpfs8D\n\nGet help with giveaways and more!`, 
-                    ephemeral: true 
-                });
-            }
-
-            if (commandName === 'help') {
-                const embed = new EmbedBuilder()
-                    .setTitle(`${client.user.username} Commands`)
-                    .setDescription(`Here are all the available commands for ${client.user.username}:`)
-                    .addFields(
-                        { name: '/start channel duration prize winners', value: 'Start a new giveaway' },
-                        { name: '/end message_id', value: 'End a giveaway early' },
-                        { name: '/reroll message_id', value: 'Reroll an ended giveaway' },
-                        { name: '/stats', value: 'Show bot statistics' },
-                        { name: '/invite', value: 'Get bot invite link' },
-                        { name: '/support', value: 'Get support server link' },
-                        { name: '/help', value: 'Show this help message' }
-                    )
-                    .setColor('#7289DA')
-                    .setFooter({ text: `${client.user.username} Giveaway System` })
-                    .setTimestamp();
-
-                await interaction.reply({ embeds: [embed] });
             }
         });
 
